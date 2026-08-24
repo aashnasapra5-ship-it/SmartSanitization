@@ -76,11 +76,11 @@ function DomDemoCard() {
     <article className="card" style={{ marginTop: '32px', border: '2px solid var(--primary-light)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
         <span style={{ fontSize: '1.5rem' }}>⚡</span>
-        <h3 style={{ fontSize: '1.25rem' }}>Evaluation Demonstration: DOM vs React State</h3>
+        <h3 style={{ fontSize: '1.25rem' }}>⚙️ Under the Hood: DOM vs React</h3>
       </div>
       
       <p style={{ fontSize: '0.9rem', marginBottom: '16px' }}>
-        This interactive component demonstrates the technical difference between direct Browser DOM manipulation and React's declarative state model.
+        See how traditional JavaScript directly changes the browser DOM versus how React manages UI updates through its state system.
       </p>
 
       <div className="grid-2">

@@ -10,7 +10,6 @@
    ======================================== */
 
 import { Link } from 'react-router-dom';
-import DomDemoCard from '../components/DomDemoCard';
 
 function Home() {
   return (
@@ -171,8 +170,6 @@ function Home() {
             </div>
           </div>
 
-          {/* Educational DOM Demonstration Card */}
-          <DomDemoCard />
         </div>
       </section>
     </main>
