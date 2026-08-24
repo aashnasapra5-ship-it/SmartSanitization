@@ -23,7 +23,7 @@ function Home() {
           </h1>
           <p>
             Report garbage in your area and help municipal teams respond efficiently.
-            SmartSanitation connects citizens, municipal officers, and sanitation employees
+            SmartSanitization connects citizens, municipal officers, and sanitation employees
             in one transparent workflow.
           </p>
           <div className="hero-actions">
@@ -89,7 +89,7 @@ function Home() {
       <section className="section" style={{ backgroundColor: 'var(--surface-alt)' }} id="solution">
         <div className="container">
           <div className="section-header">
-            <h2>How SmartSanitation Works</h2>
+            <h2>How SmartSanitization Works</h2>
             <p>A simple four-step workflow that connects citizens to municipal teams.</p>
           </div>
 
