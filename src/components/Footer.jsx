@@ -14,7 +14,7 @@ function Footer() {
         <div className="footer-grid">
           {/* Brand Section */}
           <div className="footer-brand">
-            <h3>🌿 SmartSanitation</h3>
+            <h3>🌿 SmartSanitization</h3>
             <p>
               A citizen-based smart garbage reporting and municipal response system.
               Making our cities cleaner, one report at a time.
@@ -36,7 +36,7 @@ function Footer() {
           <div className="footer-links">
             <h4>Project Info</h4>
             <ul>
-              <li><a href="#about">About SmartSanitation</a></li>
+              <li><a href="#about">About SmartSanitization</a></li>
               <li><a href="#how">How It Works</a></li>
               <li><Link to="/municipal">Municipal Portal</Link></li>
             </ul>
@@ -45,7 +45,7 @@ function Footer() {
 
         {/* Bottom Bar */}
         <div className="footer-bottom">
-          <p>&copy; 2026 SmartSanitation. Academic Project — Evaluation 1.</p>
+          <p>&copy; 2026 SmartSanitization. Academic Project — Evaluation 1.</p>
         </div>
       </div>
     </footer>

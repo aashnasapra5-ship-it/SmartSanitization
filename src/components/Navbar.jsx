@@ -26,7 +26,7 @@ function Navbar() {
       <div className="container">
         {/* Brand / Logo */}
         <NavLink to="/" className="navbar-brand" onClick={handleLinkClick}>
-          🌿 <span>Smart</span>Sanitation
+          🌿 <span>Smart</span>Sanitization
         </NavLink>
 
         {/* Navigation Links */}
