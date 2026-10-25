@@ -21,35 +21,63 @@ function LocationInput({
 
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setIsLocating(false);
-          const coords = {
-            lat: Number(pos.coords.latitude.toFixed(4)),
-            lng: Number(pos.coords.longitude.toFixed(4)),
-          };
+        async (pos) => {
+          const lat = Number(pos.coords.latitude.toFixed(4));
+          const lng = Number(pos.coords.longitude.toFixed(4));
+          const coords = { lat, lng };
+
           if (onCoordinatesChange) onCoordinatesChange(coords);
-          onLocationChange('Central Civic Sector');
-          onCityChange('Bangalore');
-          onAddressChange(`Lat: ${coords.lat}, Lng: ${coords.lng} (Device GPS Detected)`);
+
+          // Reverse geocode any location worldwide via OpenStreetMap Nominatim
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+              { headers: { 'Accept-Language': 'en' } }
+            );
+            if (!res.ok) throw new Error('Geocoding service unavailable');
+            const data = await res.json();
+            const addr = data.address || {};
+
+            const detectedCity =
+              addr.city ||
+              addr.town ||
+              addr.village ||
+              addr.state_district ||
+              addr.county ||
+              addr.state ||
+              'Local Area';
+
+            const detectedArea =
+              addr.suburb ||
+              addr.neighbourhood ||
+              addr.residential ||
+              addr.road ||
+              addr.subdivision ||
+              addr.hamlet ||
+              'Civic Ward';
+
+            const shortAddress = data.display_name
+              ? data.display_name.split(',').slice(0, 3).join(',').trim()
+              : `Lat: ${lat}, Lng: ${lng}`;
+
+            onCityChange(detectedCity);
+            onLocationChange(detectedArea);
+            onAddressChange(shortAddress);
+          } catch (_err) {
+            onAddressChange(`Lat: ${lat}, Lng: ${lng} (GPS Coordinates Detected)`);
+          } finally {
+            setIsLocating(false);
+          }
         },
         (_err) => {
-          // Graceful fallback to simulated smart city coordinates
           setIsLocating(false);
-          const demoCoords = { lat: 12.9352, lng: 77.6245 };
-          if (onCoordinatesChange) onCoordinatesChange(demoCoords);
-          onLocationChange('Koramangala 5th Block');
-          onCityChange('Bangalore');
-          onAddressChange('Near BMTC Bus Depot (Demo Coordinates Applied)');
+          alert('Could not access device GPS. Please grant browser location permission or pin your location on the map below.');
         },
-        { timeout: 4000 }
+        { timeout: 8000, enableHighAccuracy: true }
       );
     } else {
       setIsLocating(false);
-      const demoCoords = { lat: 12.9352, lng: 77.6245 };
-      if (onCoordinatesChange) onCoordinatesChange(demoCoords);
-      onLocationChange('Koramangala 5th Block');
-      onCityChange('Bangalore');
-      onAddressChange('Near BMTC Bus Depot (Demo Coordinates Applied)');
+      alert('Geolocation is not supported by your browser. Please search or pin your location on the map below.');
     }
   }
 

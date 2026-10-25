@@ -9,11 +9,13 @@ function ReportMap({ selectedCoordinates, onSelectCoordinates, existingComplaint
   const mapInstanceRef = useRef(null);
   const selectionMarkerRef = useRef(null);
 
-  // Default center: Bangalore civic center
-  const defaultCenter = [12.9352, 77.6245];
+  // Default center: India overview (works for any location worldwide)
+  const defaultCenter = [22.5, 78.9];
+  const defaultZoom = 5;
   const initialCenter = selectedCoordinates
     ? [selectedCoordinates.lat, selectedCoordinates.lng]
     : defaultCenter;
+  const initialZoom = selectedCoordinates ? 15 : defaultZoom;
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -22,8 +24,8 @@ function ReportMap({ selectedCoordinates, onSelectCoordinates, existingComplaint
     // Initialize Leaflet Map
     const map = L.map(mapContainerRef.current, {
       center: initialCenter,
-      zoom: 12,
-      scrollWheelZoom: false, // Prevent page scroll interference
+      zoom: initialZoom,
+      scrollWheelZoom: true,
     });
 
     // Add OpenStreetMap Free Tile Layer
@@ -99,10 +101,13 @@ function ReportMap({ selectedCoordinates, onSelectCoordinates, existingComplaint
     };
   }, []); // Run once on mount
 
-  // Sync external coordinates selection with map marker
+  // Sync external coordinates selection with map — fly to any detected location
   useEffect(() => {
     if (!mapInstanceRef.current || !selectedCoordinates) return;
     const { lat, lng } = selectedCoordinates;
+
+    // Smoothly fly the map to the new location and zoom in
+    mapInstanceRef.current.flyTo([lat, lng], 15, { duration: 1.2 });
 
     if (selectionMarkerRef.current) {
       selectionMarkerRef.current.setLatLng([lat, lng]);
@@ -115,13 +120,17 @@ function ReportMap({ selectedCoordinates, onSelectCoordinates, existingComplaint
       });
       selectionMarkerRef.current = L.marker([lat, lng], { icon: pinIcon }).addTo(mapInstanceRef.current);
     }
+
+    selectionMarkerRef.current.bindPopup(
+      `<div style="font-size: 12px;"><strong>Report Location</strong><br/>Lat: ${lat}, Lng: ${lng}</div>`
+    ).openPopup();
   }, [selectedCoordinates]);
 
   return (
     <div className="report-map-wrapper" style={{ marginTop: '16px', marginBottom: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
         <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-main)' }}>
-          🗺️ Pin Location on City Map (Optional)
+          🗺️ Pin Location on Map (Optional)
         </span>
         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
           Click anywhere to select coordinates
