@@ -1,78 +1,112 @@
-/* ========================================
-   LocationInput Component
-   ========================================
-   Demonstrates: Props (controlled inputs), semantic HTML (<label>, <input>),
-   reusable form section
-   ======================================== */
+// LocationInput Component
 
-function LocationInput({ location, city, address, onLocationChange, onCityChange, onAddressChange }) {
-  /*
-    Props are used for controlled inputs — the parent component
-    manages the state, and this component receives values via props
-    and reports changes back via callback functions.
-  */
+import { useState } from 'react';
+import FormInput from './common/FormInput';
 
-  function handleUseMyLocation() {
-    // For Evaluation 1, this uses mock/demo location data
-    // In future evaluations, this will use real GPS via navigator.geolocation
-    onLocationChange('Sector 12, Near Central Park');
-    onCityChange('Rajpura');
-    onAddressChange('Auto-detected location (demo)');
+function LocationInput({
+  location,
+  city,
+  address,
+  coordinates,
+  errors = {},
+  onLocationChange,
+  onCityChange,
+  onAddressChange,
+  onCoordinatesChange,
+}) {
+  const [isLocating, setIsLocating] = useState(false);
+
+  function handleAutoLocation() {
+    setIsLocating(true);
+
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setIsLocating(false);
+          const coords = {
+            lat: Number(pos.coords.latitude.toFixed(4)),
+            lng: Number(pos.coords.longitude.toFixed(4)),
+          };
+          if (onCoordinatesChange) onCoordinatesChange(coords);
+          onLocationChange('Central Civic Sector');
+          onCityChange('Bangalore');
+          onAddressChange(`Lat: ${coords.lat}, Lng: ${coords.lng} (Device GPS Detected)`);
+        },
+        (_err) => {
+          // Graceful fallback to simulated smart city coordinates
+          setIsLocating(false);
+          const demoCoords = { lat: 12.9352, lng: 77.6245 };
+          if (onCoordinatesChange) onCoordinatesChange(demoCoords);
+          onLocationChange('Koramangala 5th Block');
+          onCityChange('Bangalore');
+          onAddressChange('Near BMTC Bus Depot (Demo Coordinates Applied)');
+        },
+        { timeout: 4000 }
+      );
+    } else {
+      setIsLocating(false);
+      const demoCoords = { lat: 12.9352, lng: 77.6245 };
+      if (onCoordinatesChange) onCoordinatesChange(demoCoords);
+      onLocationChange('Koramangala 5th Block');
+      onCityChange('Bangalore');
+      onAddressChange('Near BMTC Bus Depot (Demo Coordinates Applied)');
+    }
   }
 
   return (
-    <fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
-      <legend className="form-label" style={{ marginBottom: '16px' }}>Location Details *</legend>
+    <fieldset style={{ border: 'none', padding: 0, margin: '20px 0 0 0' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <legend className="form-label" style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>
+          Location Details <span style={{ color: 'var(--danger)' }}>*</span>
+        </legend>
+        <button
+          type="button"
+          className="btn btn-secondary btn-sm"
+          onClick={handleAutoLocation}
+          disabled={isLocating}
+          title="Auto-detect current location coordinates"
+        >
+          {isLocating ? '⏳ Locating...' : '📍 Auto-Detect Location'}
+        </button>
+      </div>
 
-      <div className="form-group">
-        <label className="form-label" htmlFor="location-area">
-          Area / Locality
-        </label>
-        <input
-          type="text"
+      <div className="grid-2">
+        <FormInput
+          label="Area / Locality"
           id="location-area"
-          className="form-input"
-          placeholder="e.g. Sector 4, Market Road"
+          name="location"
+          required
+          placeholder="e.g. Koramangala 5th Block, Indiranagar"
           value={location}
-          onChange={function (e) { onLocationChange(e.target.value); }}
+          onChange={(e) => onLocationChange(e.target.value)}
+          error={errors.location}
         />
-      </div>
 
-      <div className="form-group">
-        <label className="form-label" htmlFor="location-city">
-          City
-        </label>
-        <input
-          type="text"
+        <FormInput
+          label="City"
           id="location-city"
-          className="form-input"
-          placeholder="e.g. Rajpura"
+          name="city"
+          required
+          placeholder="e.g. Bangalore"
           value={city}
-          onChange={function (e) { onCityChange(e.target.value); }}
+          onChange={(e) => onCityChange(e.target.value)}
+          error={errors.city}
         />
       </div>
 
-      <div className="form-group">
-        <label className="form-label" htmlFor="location-address">
-          Address / Landmark
-        </label>
-        <input
-          type="text"
-          id="location-address"
-          className="form-input"
-          placeholder="e.g. Near City Hospital, Gate No. 3"
-          value={address}
-          onChange={function (e) { onAddressChange(e.target.value); }}
-        />
-      </div>
-
-      <button
-        type="button"
-        className="btn btn-secondary btn-sm"
-        onClick={handleUseMyLocation}
-      >
-        📍 Use My Location (Demo)
-      </button>
+      <FormInput
+        label="Specific Landmark or Street Address"
+        id="location-address"
+        name="address"
+        placeholder="e.g. Opposite Community Park, Gate No. 2"
+        value={address}
+        onChange={(e) => onAddressChange(e.target.value)}
+        helperText={
+          coordinates
+            ? `Selected GPS Coordinates: ${coordinates.lat}, ${coordinates.lng}`
+            : 'Provide nearby landmarks to help sanitation workers locate the dump site quickly.'
+        }
+      />
     </fieldset>
   );
 }
